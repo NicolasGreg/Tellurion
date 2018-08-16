@@ -1,0 +1,53 @@
+float[] IncMensuel = {0, 31, 59.25, 90.25, 120.25, 151.25, 181.25, 212.25, 243.25, 273.25, 304.25, 334.25};
+float NbJour, mSol, LongLune, Minute, LongSolMoy, hs;
+int bissextile, Year, HeureTU ;
+
+//void setup() {
+//  noLoop();
+//}
+
+//void draw() {
+//  CalculNbJour();
+//  PositionSoleil();
+//  LaLune();
+//}
+
+////' Calcul le nombre de jours qui s'est écoulé depuis le 1er janvier 1901 ---
+void CalculNbJour() {
+  HeureTU = hour()-2;
+  Minute = float(minute());
+  float jour = day();
+  int Mois = month();
+  //println (HeureTU+" "+Minute+" "+Mois);
+  Year = year();
+  hs = (HeureTU+Minute/60)/24;
+  float ja = 365.25*(Year-1901)+jour;
+
+  NbJour = floor(ja+IncMensuel[Mois-1])+hs;
+  println("NbJour "+NbJour);
+}
+void LaLune() {
+  float LongMoyLu = .57999+.229971503*NbJour;
+  float o = 4.1867-(.00092422)*NbJour;
+  float m = .3193+.228027135*NbJour;
+  float D = LongMoyLu-LongSolMoy;
+  float f = LongMoyLu-o;
+  float l = LongMoyLu+.1098*sin(m)+.003728*sin(2*m)+.01149*sin(2*D);
+  l = l-.003329*sin(mSol)+.02224*sin(D-m)-.001945*sin(2*f);
+  l = l+.001026*sin(2*D-2*m)+0.00099829*sin(2*D-m-mSol);
+  l = l+0.000990299*sin(2*D+m)+.0008011*sin(2*D-mSol);
+  LongLune = l+.0007156*sin(m-mSol)-.0005323*sin(m+mSol)-.0006074*sin(D);
+  int rdent = floor(LongLune/(2*PI));
+  LongLune = LongLune-rdent*(2*PI);
+  if (LongLune<0) {
+    LongLune = LongLune+(2*PI);
+  }
+  println(180*LongLune/PI);
+}
+void PositionSoleil() {
+  float p = 4.9085+(0.00000081856)*NbJour;
+  LongSolMoy = 4.8689+(.0172027914)*NbJour;
+  float  m = LongSolMoy-p;
+  mSol = m;
+  println("ms "+mSol);
+}
