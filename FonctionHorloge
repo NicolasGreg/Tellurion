@@ -1,0 +1,60 @@
+void FonctionHorloge() {
+
+
+  int h=hour();
+  if (h>12) {
+    h=h-12;
+  }
+  int m=minute();
+  //heure=(h+float(m)/60)*85.3;
+  // 2048 pour un tour en une heure
+  heure=(float(h)+float(m)/60);
+  int stepFH=int(170.6*(float(h)+float(m)/60));
+
+
+  // On calcule de combien doit avancer le moteur par rapport à
+  // l'avance précédente 
+  currentStep=stepFH-previousStep;
+  //Pour le passage de 12h à 0h
+  if (currentStep<0) {
+    currentStep=2048+currentStep;
+  }
+  println("Horloge :" +heure+"  "+stepFH+" "+currentStep);
+  
+  // Pour éviter de faire plusieurs tours
+  if (currentStep>0) {
+    if (currentStep>2048) {
+      int currentStepEnt=2048 *(currentStep/2048);
+      currentStep=currentStep-currentStepEnt;
+    }
+    previousStep=stepFH;
+    String PS = str(previousStep);
+    String[] list =split(PS, ' ');
+    saveStrings("LastPosition.txt", list);
+  }
+  count=0;
+  while ( count<currentStep) {
+    //println("On avance");
+    delay(4 );
+    for (int pin=0; pin<4; pin++) {
+
+      if (seq[step][pin]==1) {
+        GPIO.digitalWrite(controlPin[pin], GPIO.HIGH);
+      } else {
+        GPIO.digitalWrite(controlPin[pin], GPIO.LOW);
+      }
+    }
+    step++;
+    if ( step==4) {
+      step=0;
+    }
+    count++;
+    println(count);
+  }
+
+  //Remise à zero des pin pour éviter l'échauffement du moteur
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPin[pin], GPIO.LOW);
+  }
+  ms=millis();
+}
