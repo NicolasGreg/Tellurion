@@ -2,16 +2,6 @@ float[] IncMensuel = {0, 31, 59.25, 90.25, 120.25, 151.25, 181.25, 212.25, 243.2
 float NbJour, mSol, LongLune, Minute, LongSolMoy, hs;
 int bissextile, Year, HeureTU ;
 
-//void setup() {
-//  noLoop();
-//}
-
-//void draw() {
-//  CalculNbJour();
-//  PositionSoleil();
-//  LaLune();
-//}
-
 ////' Calcul le nombre de jours qui s'est écoulé depuis le 1er janvier 1901 ---
 void CalculNbJour() {
   HeureTU = hour()-2;
@@ -37,7 +27,8 @@ void LaLune() {
   l = l+.001026*sin(2*D-2*m)+0.00099829*sin(2*D-m-mSol);
   l = l+0.000990299*sin(2*D+m)+.0008011*sin(2*D-mSol);
   LongLune = l+.0007156*sin(m-mSol)-.0005323*sin(m+mSol)-.0006074*sin(D);
-  int rdent = floor(LongLune/(2*PI));
+//Ramène l'angle entre 0 et 2PI
+int rdent = floor(LongLune/(2*PI));
   LongLune = LongLune-rdent*(2*PI);
   if (LongLune<0) {
     LongLune = LongLune+(2*PI);
