@@ -2,15 +2,17 @@ void FonctionHorloge() {
 
 
   int h=hour();
-  if (h>12) {
+  if (h>=12) {
     h=h-12;
   }
   int m=minute();
   //heure=(h+float(m)/60)*85.3;
   // 2048 pour un tour en une heure
   heure=(float(h)+float(m)/60);
-  int stepFH=int(170.6*(float(h)+float(m)/60));
-
+  int stepFH=int(170.66*(float(h)+float(m)/60));
+ if (stepFH>2047) {
+    stepFH=stepFH%2048;
+    }
 
   // On calcule de combien doit avancer le moteur par rapport à
   // l'avance précédente 
@@ -23,10 +25,7 @@ void FonctionHorloge() {
   
   // Pour éviter de faire plusieurs tours
   if (currentStep>0) {
-    if (currentStep>2048) {
-      int currentStepEnt=2048 *(currentStep/2048);
-      currentStep=currentStep-currentStepEnt;
-    }
+   
     previousStep=stepFH;
     String PS = str(previousStep);
     String[] list =split(PS, ' ');
