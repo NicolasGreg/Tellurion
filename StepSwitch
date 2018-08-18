@@ -1,0 +1,32 @@
+switch(_step) { 
+case 0: 
+  GPIO.digitalWrite(controlPin[1], GPIO.HIGH);   
+  GPIO.digitalWrite(controlPin[2], GPIO.HIGH); 
+  GPIO.digitalWrite(controlPin[3], GPIO.LOW); 
+  GPIO.digitalWrite(controlPin[4], GPIO.LOW); 
+  break;  
+case 1: 
+  GPIO.digitalWrite(controlPin[1], GPIO.LOW);   
+  GPIO.digitalWrite(controlPin[2], GPIO.HIGH); 
+  GPIO.digitalWrite(controlPin[3], GPIO.HIGH); 
+  GPIO.digitalWrite(controlPin[4], GPIO.LOW); 
+  break;  
+case 2: 
+  GPIO.digitalWrite(controlPin[1], GPIO.LOW);   
+  GPIO.digitalWrite(controlPin[2], GPIO.LOW); 
+  GPIO.digitalWrite(controlPin[3], GPIO.HIGH); 
+  GPIO.digitalWrite(controlPin[4], GPIO.HIGH); 
+  break;  
+case 3: 
+  GPIO.digitalWrite(controlPin[1], GPIO.HIGH);   
+  GPIO.digitalWrite(controlPin[2], GPIO.LOW); 
+  GPIO.digitalWrite(controlPin[3], GPIO.LOW); 
+  GPIO.digitalWrite(controlPin[4], GPIO.HIGH); 
+  break;
+} 
+
+  _step++;
+if (_step>3) { 
+  _step=0;
+} 
+delay(1); 
