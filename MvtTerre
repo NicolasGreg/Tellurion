@@ -1,0 +1,62 @@
+void MvtTerre() {
+  // 512 pour un tour en une heure
+  heure=float(hour());
+  int stepFH=floor(map(heure, 0, 24, 0, 513.4));
+
+  // On calcule de combien doit avancer le moteur par rapport à
+  // l'avance précédente 
+  currentStep=stepFH-previousStep;
+  //Pour le passage de 12h à 0h
+  if (currentStep<0) {
+    currentStep=512+currentStep;
+  }
+  println("StepTerre : "+step+"   "+currentStep+" ");
+
+  if (currentStep>0) {
+    previousStep=stepFH;
+    //String PS = str(previousStep);
+    //String[] list =split(PS, ' ');
+    //saveStrings("LastPosition.txt", list);
+  }
+  count=0;
+  while ( count<currentStep) {
+    for (int step=0; step<4; step++) {
+      delay(10 );
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;
+      }
+    }
+    count++;
+  }
+
+
+
+  //Remise à zero des pin pour éviter l'échauffement du moteur
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPin[pin], GPIO.LOW);
+  }
+  ms=millis();
+}
