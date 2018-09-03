@@ -1,22 +1,113 @@
 float[] IncMensuel = {0, 31, 59.25, 90.25, 120.25, 151.25, 181.25, 212.25, 243.25, 273.25, 304.25, 334.25};
-float NbJour, mSol, LongLune, Minute, LongSolMoy, hs;
-int bissextile, Year, HeureTU ;
+float NbJour, mSol, LongLune, Minute, LongSolMoy, hs, NbJour2;
+int bissextile, Year, HeureTU, stepNbJ;
 
 ////' Calcul le nombre de jours qui s'est écoulé depuis le 1er janvier 1901 ---
 void CalculNbJour() {
-  HeureTU = hour()-2;
+  HeureTU = hour();
   Minute = float(minute());
   float jour = day();
-  int Mois = month();
+  Mois = month();
   //println (HeureTU+" "+Minute+" "+Mois);
   Year = year();
   hs = (HeureTU+Minute/60)/24;
   float ja = 365.25*(Year-1901)+jour;
-
+//Nombre de jour depuis le1erJanvier1901
   NbJour = floor(ja+IncMensuel[Mois-1])+hs;
-  println("NbJour "+NbJour);
+//Nombre de jour depuis le 1er janvier de l'année en cours
+NbJour2 = floor(IncMensuel[Mois-1])+jour;
 }
+
+void Initialisation() {
+  // On déplace le soleil à partir du Point Vernal
+  // 512 x 5= 2560 , rapport d'engrenage moteur/ soleil
+  // On enlève 80,25 parce q'on part du 21 mars et non du 1er janv
+  stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 2560));
+
+
+ println("NbJour depuis 1er janvier : "+NbJour2+" Nb Pas  :  "+stepNbJ);
+ stepNbJ=0;
+  for (int stepNb=0; stepNb<stepNbJ; stepNb++) {
+    for (int step=3; step>=0; step--) {
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPin[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPin[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPin[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPin[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPin[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPin[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPin[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPin[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPin[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPin[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPin[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPin[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPin[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPin[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPin[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPin[3], GPIO.LOW); 
+        break;
+      }
+      delay(20 );
+      //Remise à zero des pin pour éviter l'échauffement du moteur
+      //for (int pin=0; pin<4; pin++) {   
+      //  GPIO.digitalWrite(controlPin[pin], GPIO.LOW);
+    }
+  }
+// On tourne la Terre pour rattraper la révolution au cours des moisécoulés 
+  stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 512));
+  // onajoute larotation pour l'heure courante
+ println ("Avance Terre /Soleil:  "+stepNbJ);
+ // stepNbJ=stepNbJ+floor(map(HeureTU, 0, 24, 0, 512));
+  //   stepNbJ=floor(map(180, 0, 360, 0, 512));
+ println ("Avance Terre /heure:  "+stepNbJ);
+  for (int stepNb=0; stepNb<stepNbJ; stepNb++) {
+    for (int step=0; step<4; step++) {
+
+      delay(10 );
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;
+      }
+    }
+  }
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinTerre[pin], GPIO.LOW);
+  }
+}
+
+
 void LaLune() {
+  PositionSoleil();
   float LongMoyLu = .57999+.229971503*NbJour;
   float o = 4.1867-(.00092422)*NbJour;
   float m = .3193+.228027135*NbJour;
@@ -27,18 +118,82 @@ void LaLune() {
   l = l+.001026*sin(2*D-2*m)+0.00099829*sin(2*D-m-mSol);
   l = l+0.000990299*sin(2*D+m)+.0008011*sin(2*D-mSol);
   LongLune = l+.0007156*sin(m-mSol)-.0005323*sin(m+mSol)-.0006074*sin(D);
-//Ramène l'angle entre 0 et 2PI
-int rdent = floor(LongLune/(2*PI));
+  int rdent = floor(LongLune/(2*PI));
   LongLune = LongLune-rdent*(2*PI);
   if (LongLune<0) {
     LongLune = LongLune+(2*PI);
   }
   println(180*LongLune/PI);
+  stepLune=floor(map(LongLune, 0, 2*PI, 0, 512));
+
+  // On calcule de combien doit avancer le moteur par rapport à
+  // l'avance précédente 
+  currentStepLune=stepLune-previousStepLune;
+  //Pour le passage de 12h à 0h
+  if (currentStepLune<0) {
+    currentStepLune=512+currentStepLune;
+  }
+  println("StepLune : "+step+"   "+currentStepLune+" ");
+
+  if (currentStepLune>0) {
+    previousStepLune=stepLune;
+    //String PS = str(previousStep);
+    //String[] list =split(PS, ' ');
+    //saveStrings("LastPosition.txt", list);
+  }
+  count=0;
+  while ( count<currentStepLune) {
+    for (int step=3; step>=0; step--) {
+      delay(10 );
+
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.LOW); 
+        break;
+      }
+    }
+    count++;
+  }
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinLune[pin], GPIO.LOW);
+  }
 }
 void PositionSoleil() {
+  HeureTU = hour();
+  Minute = float(minute());
+  float jour = day();
+  int Mois = month();
+  //println (HeureTU+" "+Minute+" "+Mois);
+  Year = year();
+  hs = (HeureTU+Minute/60)/24;
+  float ja = 365.25*(Year-1901)+jour;
+
+  NbJour = floor(ja+IncMensuel[Mois-1])+hs;
   float p = 4.9085+(0.00000081856)*NbJour;
   LongSolMoy = 4.8689+(.0172027914)*NbJour;
   float  m = LongSolMoy-p;
   mSol = m;
-  println("ms "+mSol);
+
+  //println("ms "+((180*(mSol % 2*PI)))/PI);
 }
