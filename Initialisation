@@ -1,0 +1,35 @@
+
+void Initialisation() {
+  // On déplace le soleil à partir du Point Vernal
+  // 512 x 5= 2560 , rapport d'engrenage moteur/ soleil
+  // On enlève 80,25 parce q'on part du 21 mars et non du 1er janv
+  // stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 2560));
+
+  println(NbJour2-80);
+  for (int a=1; a<=(NbJour2-80); a++) {
+    count=0;
+   // mvtSoleil();
+  }
+
+  println("NbJour depuis 1er janvier : "+NbJour2+" Nb Pas  :  "+stepNbJ);
+
+
+  // On tourne la Terre pour rattraper la révolution au cours des moisécoulés 
+  stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 512));
+  // onajoute larotation pour l'heure courante
+  println ("Avance Terre /Soleil:  "+stepNbJ);
+  //stepNbJ=stepNbJ+floor(map(HeureTU, 0, 24, 0, 512));
+  //   stepNbJ=floor(map(180, 0, 360, 0, 512));
+  println ("Avance Terre /heure:  "+stepNbJ);
+  for (int stepNb=0; stepNb<stepNbJ; stepNb++) {
+
+    AvanceTerre();
+  }
+  for (int stepNb=0; stepNb<heure; stepNb++) {
+    count=0;
+    while ( count<AvHeure[count]) {
+      AvanceTerre();
+      count++;
+    }
+  }
+}
