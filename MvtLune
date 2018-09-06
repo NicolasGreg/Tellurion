@@ -1,28 +1,14 @@
-float[] IncMensuel = {0, 31, 59.25, 90.25, 120.25, 151.25, 181.25, 212.25, 243.25, 273.25, 304.25, 334.25};
-float NbJour, mSol, LongLune, Minute, LongSolMoy, hs, NbJour2;
-int bissextile, Year, HeureTU, stepNbJ;
-
-////' Calcul le nombre de jours qui s'est écoulé depuis le 1er janvier 1901 ---
-void CalculNbJour() {
-  HeureTU = hour();
-  Minute = float(minute());
-  float jour = day();
-  Mois = month();
-  //println (HeureTU+" "+Minute+" "+Mois);
-  Year = year();
-  hs = (HeureTU+Minute/60)/24;
-  float ja = 365.25*(Year-1901)+jour;
-//Nombre de jour depuis le1erJanvier1901
-  NbJour = floor(ja+IncMensuel[Mois-1])+hs;
-//Nombre de jour depuis le 1er janvier de l'année en cours
-NbJour2 = floor(IncMensuel[Mois-1])+jour;
-}
-
 void LaLune() {
-  PositionSoleil();
+  hs = (heure)/24;
+  float ja = 365.25*(Year-1901)+jour;
+  NbJour = floor(ja+IncMensuel[Mois])+hs;
+  float p = 4.9085+(0.00000081856)*NbJour;
+  LongSolMoy = 4.8689+(.0172027914)*NbJour;
+  float  mSol = LongSolMoy-p;
+  println("M Sol : "+mSol);
   float LongMoyLu = .57999+.229971503*NbJour;
   float o = 4.1867-(.00092422)*NbJour;
-  float m = .3193+.228027135*NbJour;
+ float m = .3193+.228027135*NbJour;
   float D = LongMoyLu-LongSolMoy;
   float f = LongMoyLu-o;
   float l = LongMoyLu+.1098*sin(m)+.003728*sin(2*m)+.01149*sin(2*D);
@@ -35,7 +21,7 @@ void LaLune() {
   if (LongLune<0) {
     LongLune = LongLune+(2*PI);
   }
-  println(180*LongLune/PI);
+  println("LongLune :   "+180*LongLune/PI);
   stepLune=floor(map(LongLune, 0, 2*PI, 0, 512));
 
   // On calcule de combien doit avancer le moteur par rapport à
@@ -45,7 +31,7 @@ void LaLune() {
   if (currentStepLune<0) {
     currentStepLune=512+currentStepLune;
   }
-  println("StepLune : "+step+"   "+currentStepLune+" ");
+  // println("StepLune : "+step+"   "+currentStepLune+" ");
 
   if (currentStepLune>0) {
     previousStepLune=stepLune;
@@ -92,20 +78,19 @@ void LaLune() {
   }
 }
 void PositionSoleil() {
-  HeureTU = hour();
-  Minute = float(minute());
-  float jour = day();
-  int Mois = month();
-  //println (HeureTU+" "+Minute+" "+Mois);
-  Year = year();
-  hs = (HeureTU+Minute/60)/24;
+  //HeureTU = hour();
+  //Minute = float(minute());
+  //float jour = day();
+  //int Mois = month();
+
+  //Year = year();
+  hs = (heure)/24;
   float ja = 365.25*(Year-1901)+jour;
 
-  NbJour = floor(ja+IncMensuel[Mois-1])+hs;
+  NbJour = floor(ja+IncMensuel[Mois])+hs;
   float p = 4.9085+(0.00000081856)*NbJour;
   LongSolMoy = 4.8689+(.0172027914)*NbJour;
   float  m = LongSolMoy-p;
   mSol = m;
-
-  //println("ms "+((180*(mSol % 2*PI)))/PI);
+  println("M Sol : "+mSol);
 }
