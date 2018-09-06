@@ -1,43 +1,37 @@
 void mvtSoleil() {
-
-  if (jour!=previousDay) {
-    println("Soleil");
-    previousDay=jour;
-    count=0;
-    while ( count<7) {
-      for (int step=3; step>=0; step--) {
-        delay(10 );
-        switch(step) { 
-        case 0:
-          GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
-          GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
-          GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
-          GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
-          break;  
-        case 1:
-          GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
-          GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
-          GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
-          GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
-          break;  
-        case 2:
-          GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
-          GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
-          GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
-          GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
-          break;  
-        case 3:
-          GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
-          GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
-          GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
-          GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
-          break;
-        }
+  while ( count<7) {
+    for (int step=3; step>=0; step--) {
+      delay(10 );
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
+        break;
       }
-      count++;
     }
-    for (int pin=0; pin<4; pin++) {   
-      GPIO.digitalWrite(controlPinSoleil[pin], GPIO.LOW);
-    }
+    count++;
+  }
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinSoleil[pin], GPIO.LOW);
   }
 }
