@@ -1,0 +1,36 @@
+void AvanceTerre() {
+  for (int step=0; step<4; step++) {
+    delay(10 );
+    switch(step) { 
+    case 0:
+      GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+      GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+      GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+      GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+      break;  
+    case 1:
+      GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+      GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+      GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+      GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+      break;  
+    case 2:
+      GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+      GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+      GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+      GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+      break;  
+    case 3:
+      GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+      GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+      GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+      GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+      break;
+    }
+  }
+
+  //Remise à zero des pin pour éviter l'échauffement du moteur
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinTerre[pin], GPIO.LOW);
+  }
+}
