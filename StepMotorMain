@@ -1,36 +1,204 @@
-void AvanceTerre() {
-  for (int step=0; step<4; step++) {
-    delay(10 );
-    switch(step) { 
-    case 0:
-      GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
-      GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
-      GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
-      GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
-      break;  
-    case 1:
-      GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
-      GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
-      GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
-      GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
-      break;  
-    case 2:
-      GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
-      GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
-      GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
-      GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
-      break;  
-    case 3:
-      GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
-      GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
-      GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
-      GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
-      break;
+// /opt/vc/bin/vcgencmd measure_temp
+
+import processing.io.*; // use the GPIO library
+int step, step2, previousStep, currentStep, count=0, count2=0, ms2, totalCount=0, 
+  previousDay, previousHour, jour, stepLune, previousStepLune, currentStepLune, Mois, TotalJour, r, AvanceAn;
+
+int[ ]  controlPinTerre ={10, 9, 11, 5};
+int[ ]  controlPinSoleil ={4, 17, 27, 22};
+int[ ]  controlPinLune ={6, 13, 19, 26};
+int[ ]  AvHeure ={21, 22, 21, 22, 21, 22, 21, 22, 21, 22, 21, 22, 21, 22, 21, 22, 21, 22, 21, 21, 21, 21, 21, 21, };
+int[ ] AvJour= {0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 
+  0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 
+  1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 
+  0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 
+  1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 
+  0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 
+  0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 
+  1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1};
+int [][] seq={{1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 1, 1}, {1, 0, 0, 1}};
+int ms=millis();
+boolean start=true;
+int heure;
+
+void setup() {
+  size(640, 360);
+  background(102);
+  // Config des pins de boutons en entrée
+  GPIO.pinMode(2, GPIO.INPUT_PULLUP);
+  GPIO.pinMode(3, GPIO.INPUT_PULLUP);
+  GPIO.pinMode(21, GPIO.INPUT_PULLUP);
+
+  // Config des pins de moteurs en sortie
+  for (int i = 0; i < 4; i++) {
+    GPIO.pinMode(controlPinSoleil[i], GPIO.OUTPUT);
+  }
+  for (int i = 0; i < 4; i++) {
+    GPIO.pinMode(controlPinTerre[i], GPIO.OUTPUT);
+  }
+  for (int i = 0; i < 4; i++) {
+    GPIO.pinMode(controlPinLune[i], GPIO.OUTPUT);
+  }
+  heure=hour();
+  previousHour=heure;
+
+  // HeureTU = hour();
+  //Minute = float(minute());
+  jour = day();
+Mois = month();
+ Year = year(); 
+  ////heure=20;
+  //jour=9;
+  //Mois=9;
+  //Year=2018;
+
+  CalculNbJour();
+ 
+Initialisation();
+LaLune();
+}
+
+
+void draw() {
+  if (millis()-ms>60000) {
+    heure=hour();
+  
+    if (previousHour!=heure) {
+        LaLune();
+      // jour=day();
+
+      //delay(10);
+      //heure++;
+      if (heure==0) {
+        //  delay(1000);
+        count2=0;
+        //  heure=0;
+
+        jour++;
+        if (jour>365) {
+          jour=0;
+          AvanceAn=5;
+        } else {
+          AvanceAn=0;
+        } 
+        //  println("Heure : "+heure+" Jour : "+jour);
+        //  if (jour!=previousDay) {
+        //    println("Soleil");
+        //    previousDay=jour;
+        //    count=0;
+        mvtSoleil();
+        //  }
+      }
+      MvtTerre();
+      previousHour=heure;
     }
   }
+  //FFW Terre
 
-  //Remise à zero des pin pour éviter l'échauffement du moteur
+  if ( GPIO.digitalRead(3)==GPIO.LOW) {
+    for (int step=0; step<4; step++) {                                             
+      delay(5 );
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinTerre[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinTerre[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinTerre[3], GPIO.LOW); 
+        break;
+      }
+    }
+  }
   for (int pin=0; pin<4; pin++) {   
     GPIO.digitalWrite(controlPinTerre[pin], GPIO.LOW);
+  }
+
+  //FFW Soleil
+  while ( GPIO.digitalRead(2)==GPIO.LOW) {
+    for (int step=0; step<4; step++) {
+      delay(5 );
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinSoleil[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinSoleil[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinSoleil[3], GPIO.LOW); 
+        break;
+      }
+    }
+  }
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinSoleil[pin], GPIO.LOW);
+  }
+  //FFW Lune
+  while ( GPIO.digitalRead(21)==GPIO.LOW) {
+    for (int step=0; step<4; step++) {
+      delay(5 );
+
+      switch(step) { 
+      case 0:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.LOW); 
+        break;  
+      case 1:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.HIGH);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.HIGH); 
+        break;  
+      case 2:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.LOW); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.HIGH); 
+        break;  
+      case 3:
+        GPIO.digitalWrite(controlPinLune[0], GPIO.LOW);   
+        GPIO.digitalWrite(controlPinLune[1], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[2], GPIO.HIGH); 
+        GPIO.digitalWrite(controlPinLune[3], GPIO.LOW); 
+        break;
+      }
+    }
+  }
+  for (int pin=0; pin<4; pin++) {   
+    GPIO.digitalWrite(controlPinLune[pin], GPIO.LOW);
   }
 }
