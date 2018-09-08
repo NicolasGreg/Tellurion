@@ -1,0 +1,16 @@
+float[] IncMensuel = {0, 0, 31, 59.25, 90.25, 120.25, 151.25, 181.25, 212.25, 243.25, 273.25, 304.25, 334.25};
+float NbJour, mSol, LongLune, Minute, LongSolMoy, hs, NbJour2;
+int bissextile, Year, HeureTU, stepNbJ;
+
+////' Calcul le nombre de jours qui s'est écoulé depuis le 1er janvier 1901 ---
+void CalculNbJour() {
+
+
+  hs = float(heure)/24;
+  float ja = 365.25*(Year-1901)+jour;
+  //Nombre de jour depuis le1erJanvier1901
+  NbJour = float(floor(ja+IncMensuel[Mois]))+hs;
+ println("Nb Jour  "+NbJour+"   "+hs);
+  //Nombre de jour depuis le 1er janvier de l'année en cours
+  NbJour2 = floor(IncMensuel[Mois])+jour;
+}
