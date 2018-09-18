@@ -1,0 +1,32 @@
+int step, step2, previousStep, currentStep, stepNbJV,count=0, count2=0, ms2, totalCount=0, DayCount,count4,avance, count3,
+  previousDay, previousStepSol, previousHour, jour, stepLune, previousStepLune, currentStepLune, Mois, TotalJour, r, AvanceAn;
+
+int[ ]  controlPinTerre ={10, 9, 11, 5};
+int[ ]  controlPinSoleil ={4, 17, 27, 22};
+int[ ]  controlPinLune ={6, 13, 19, 26};
+int[ ]  AvHeure ={21, 22, 21, 22, 21, 22, 21, 22, 21, 21, 21, 22, 21, 22, 21, 22, 21, 22, 21, 21, 21, 21, 21, 21 };
+int[ ] AvJour= { 1, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 
+  1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 
+  1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 2};
+
+
+int [][] seq={{1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 1, 1}, {1, 0, 0, 1}};
+int ms=millis();
+boolean start=true;
+boolean startLune=false;
+boolean startTerre=false;
+int heure;
+int x, x1, xl, xl1, y, yl, y1, yl1, yt, xt, xt1, yt1, xsv, ysv, xsv1, ysv1;
+
+float f, fg, ft, u;
+float fl;
+int centrex, centrey,Initialisation=0;
+float AS=2*PI/2560;
+float AL=2*PI/2560;
+float pas= 2*PI/2560;
