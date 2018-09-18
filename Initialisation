@@ -1,34 +1,52 @@
-
 void Initialisation() {
   // On déplace le soleil à partir du Point Vernal
   // 512 x 5= 2560 , rapport d'engrenage moteur/ soleil
   // On enlève 80,25 parce q'on part du 21 mars et non du 1er janv
-  // stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 2560));
 
-  println(NbJour2-80);
-  for (int a=1; a<=(NbJour2-80); a++) {
-    count=0;
-   // mvtSoleil();
+  // stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 2560))+2;
+  float LongSol=PositionSoleil();
+  stepNbJV=-2+floor(map(LongSol, 0, 2*PI, 0, 2560));
+  println(NbJour2+"  " +stepNbJ+"   "+stepNbJV);
+
+  for (int stepNb=0; stepNb<stepNbJV; stepNb++) {
+    xsv1 = round(xsv*cos( -stepNb*pas) - ysv*sin( -stepNb*pas));
+    ysv1 = round(ysv*cos( -stepNb*pas) + xsv*sin( -stepNb*pas));
   }
+  LaLune();
+  stepNbJV=floor(map(LongLune, 0, 2*PI, 0, 2560));
 
-  println("NbJour depuis 1er janvier : "+NbJour2+" Nb Pas  :  "+stepNbJ);
 
-
-  // On tourne la Terre pour rattraper la révolution au cours des moisécoulés 
-  stepNbJ=floor(map(NbJour2-80.25, 0, 365, 0, 512));
-  // onajoute larotation pour l'heure courante
-  println ("Avance Terre /Soleil:  "+stepNbJ);
+  for (int stepNb=0; stepNb<stepNbJV; stepNb++) {
+    xl1 = round(xl*cos( fl) - yl*sin( fl));
+    yl1 = round(yl*cos( fl) + xl*sin( fl));
+  }
+  //println("NbJour depuis 1er janvier : "+NbJour2+" Nb Pas  :  "+stepNbJ);
+  //// On tourne la Terre pour rattraper la révolution au cours des moisécoulés 
+  stepNbJV=floor(map(NbJour2-80.25, 0, 365, 0, 512));
+  //// on ajoute la rotation pour l'heure courante
+  //println ("Avance Terre /Soleil:  "+stepNbJ);
   //stepNbJ=stepNbJ+floor(map(HeureTU, 0, 24, 0, 512));
-  //   stepNbJ=floor(map(180, 0, 360, 0, 512));
-  println ("Avance Terre /heure:  "+stepNbJ);
-  for (int stepNb=0; stepNb<stepNbJ; stepNb++) {
-
-    AvanceTerre();
+  ////   stepNbJ=floor(map(180, 0, 360, 0, 512));
+  //println ("Avance Terre /heure:  "+stepNbJ);
+  int count=0;
+  for (int stepNb=0; stepNb<stepNbJV; stepNb++) {
+    // while ( count<(AvHeure[heure]+r*AvJour[jour-1])) {
+    ft=ft-(2*PI/512);
+    xt1 = round(xt*cos( ft-PI) - yt*sin( ft-PI));
+    yt1 = round(yt*cos( ft-PI) + xt*sin( ft-PI));
+    ft=ft % (2*PI);
   }
-  for (int stepNb=0; stepNb<heure; stepNb++) {
+  ft=0;
+  for (int stepNb=0; stepNb<heure-1; stepNb++) {
+    
     count=0;
-    while ( count<AvHeure[count]) {
-      AvanceTerre();
+    while ( count<(AvHeure[stepNb]+r*AvJour[jour-1])) {
+
+      ft=ft-(2*PI/512);
+      xt1 = round(xt*cos( ft-PI) - yt*sin( ft-PI));
+      yt1 = round(yt*cos( ft-PI) + xt*sin( ft-PI));
+      ft=ft % (2*PI);
+     // println(count+"  "+ft*180/PI);
       count++;
     }
   }
